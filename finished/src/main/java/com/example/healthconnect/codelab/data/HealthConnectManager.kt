@@ -24,9 +24,12 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_AVAILABLE
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.changes.Change
+import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ExerciseRouteResult
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
@@ -62,7 +65,7 @@ class HealthConnectManager(private val context: Context) {
 
   fun checkAvailability() {
     availability.value = when {
-      HealthConnectClient.sdkStatus(context) == SDK_AVAILABLE -> HealthConnectAvailability.INSTALLED
+      HealthConnectClient.getSdkStatus(context) == SDK_AVAILABLE -> HealthConnectAvailability.INSTALLED
       isSupported() -> HealthConnectAvailability.NOT_INSTALLED
       else -> HealthConnectAvailability.NOT_SUPPORTED
     }
@@ -214,6 +217,8 @@ class HealthConnectManager(private val context: Context) {
     val aggregateDataTypes = setOf(
       ExerciseSessionRecord.EXERCISE_DURATION_TOTAL,
       StepsRecord.COUNT_TOTAL,
+      DistanceRecord.DISTANCE_TOTAL,
+      SpeedRecord.SPEED_AVG,
       TotalCaloriesBurnedRecord.ENERGY_TOTAL,
       HeartRateRecord.BPM_AVG,
       HeartRateRecord.BPM_MAX,
@@ -230,16 +235,24 @@ class HealthConnectManager(private val context: Context) {
     )
     val aggregateData = healthConnectClient.aggregate(aggregateRequest)
     val heartRateData = readData<HeartRateRecord>(timeRangeFilter, dataOriginFilter)
+    val speedData = readData<SpeedRecord>(timeRangeFilter, dataOriginFilter)
+    val isLocationDataAvailable = exerciseSession.record.exerciseRouteResult is ExerciseRouteResult.Data
 
     return ExerciseSessionData(
       uid = uid,
+      title = exerciseSession.record.title,
+      route = if(isLocationDataAvailable) (exerciseSession.record.exerciseRouteResult as ExerciseRouteResult.Data).exerciseRoute.route else null,
+      exerciseType = exerciseSession.record.exerciseType,
+      metadata = exerciseSession.record.metadata,
       totalActiveTime = aggregateData[ExerciseSessionRecord.EXERCISE_DURATION_TOTAL],
       totalSteps = aggregateData[StepsRecord.COUNT_TOTAL],
+      totalDistance = aggregateData[DistanceRecord.DISTANCE_TOTAL],
       totalEnergyBurned = aggregateData[TotalCaloriesBurnedRecord.ENERGY_TOTAL],
-      minHeartRate = aggregateData[HeartRateRecord.BPM_MIN],
-      maxHeartRate = aggregateData[HeartRateRecord.BPM_MAX],
-      avgHeartRate = aggregateData[HeartRateRecord.BPM_AVG],
+      minSpeed = aggregateData[SpeedRecord.SPEED_MIN],
+      maxSpeed = aggregateData[SpeedRecord.SPEED_MAX],
+      avgSpeed = aggregateData[SpeedRecord.SPEED_AVG],
       heartRateSeries = heartRateData,
+      speedRecord = speedData
     )
   }
 

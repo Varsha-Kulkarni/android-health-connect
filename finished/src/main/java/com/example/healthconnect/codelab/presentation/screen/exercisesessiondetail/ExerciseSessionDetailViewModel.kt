@@ -21,7 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.SpeedRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
+
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
@@ -39,6 +43,9 @@ class ExerciseSessionDetailViewModel(
 ) : ViewModel() {
   val permissions = setOf(
     HealthPermission.getReadPermission(StepsRecord::class),
+    HealthPermission.getReadPermission(DistanceRecord::class),
+    HealthPermission.getReadPermission(SpeedRecord::class),
+    HealthPermission.getReadPermission(ExerciseSessionRecord::class),
     HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
     HealthPermission.getReadPermission(HeartRateRecord::class)
   )

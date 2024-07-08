@@ -40,6 +40,7 @@ import com.example.healthconnect.codelab.data.formatTime
 import com.example.healthconnect.codelab.presentation.component.ExerciseSessionDetailsMinMaxAvg
 import com.example.healthconnect.codelab.presentation.component.heartRateSeries
 import com.example.healthconnect.codelab.presentation.component.sessionDetailsItem
+import com.example.healthconnect.codelab.presentation.component.speedSeries
 import com.example.healthconnect.codelab.presentation.theme.HealthConnectTheme
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -104,6 +105,9 @@ fun ExerciseSessionDetailScreen(
         sessionDetailsItem(labelId = R.string.total_steps) {
           Text(sessionMetrics.totalSteps?.toString() ?: "0")
         }
+        sessionDetailsItem(labelId = R.string.total_distance) {
+          Text(sessionMetrics.totalDistance?.toString() ?: "0")
+        }
         sessionDetailsItem(labelId = R.string.total_energy) {
           Text(sessionMetrics.totalEnergyBurned?.inCalories.toString())
         }
@@ -117,9 +121,24 @@ fun ExerciseSessionDetailScreen(
               ?: stringResource(id = R.string.not_available_abbrev)
           )
         }
+
+        sessionDetailsItem(labelId = R.string.speed_stats) {
+          ExerciseSessionDetailsMinMaxAvg(
+            sessionMetrics.minSpeed?.toString()
+              ?: stringResource(id = R.string.min_label),
+            sessionMetrics.maxSpeed?.toString()
+              ?: stringResource(id = R.string.max_label),
+            sessionMetrics.avgSpeed?.toString()
+              ?: stringResource(id = R.string.avg_label)
+          )
+        }
         heartRateSeries(
           labelId = R.string.hr_series,
           series = sessionMetrics.heartRateSeries
+        )
+        speedSeries(
+          labelId = R.string.speed_series,
+          series = sessionMetrics.speedRecord
         )
       }
     }

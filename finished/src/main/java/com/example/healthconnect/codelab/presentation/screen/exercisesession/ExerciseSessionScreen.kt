@@ -38,6 +38,7 @@ import androidx.health.connect.client.records.metadata.Metadata
 import com.example.healthconnect.codelab.R
 import com.example.healthconnect.codelab.presentation.component.ExerciseSessionRow
 import com.example.healthconnect.codelab.presentation.theme.HealthConnectTheme
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -110,8 +111,8 @@ fun ExerciseSessionScreen(
 
         items(sessionsList) { session ->
           ExerciseSessionRow(
-            ZonedDateTime.ofInstant(session.startTime, session.startZoneOffset),
-            ZonedDateTime.ofInstant(session.endTime, session.endZoneOffset),
+            ZonedDateTime.ofInstant(session.startTime, session.startZoneOffset?: ZoneId.systemDefault()),
+            ZonedDateTime.ofInstant(session.endTime, session.endZoneOffset?: ZoneId.systemDefault()),
             session.metadata.id,
             session.title ?: stringResource(R.string.no_title),
             onDetailsClick = { uid ->
